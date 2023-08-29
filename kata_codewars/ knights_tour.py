@@ -81,6 +81,8 @@ def preparations(start, size):
 
     return board, moves, start
 
+
+
 #          -- Main calculations --
 def calculations(board, moves, start):
     final_moves_list = [start]
@@ -91,7 +93,7 @@ def calculations(board, moves, start):
     for m1, m2 in moves:
         next_pos = [start[0] + m1, start[1] + m2]
         try:
-            if board[next_pos[0]][next_pos[1]] != "K" and 0 <= next_pos[0] < size and 0 <= next_pos[1] < size: 
+            if board[next_pos[0]][next_pos[1]] != "K" and 0 <= next_pos[0] < len(board[0]) and 0 <= next_pos[1] < len(board[0]): 
                 return_position = calculations(board, moves, next_pos)
                 if return_position:               
                     final_moves_list.extend(return_position)
@@ -107,8 +109,8 @@ def calculations(board, moves, start):
 
 def knights_tour(start, size):
     board, moves, start = preparations(start, size)
-    return calculations(board, moves, start)
-
+    rslt = [tuple(x) for x in calculations(board, moves, start)]
+    return rslt
 
 
 
