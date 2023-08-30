@@ -66,56 +66,47 @@ def animate_tour(size, moves):
     turtle.done()
 
 
-
-
-#          -- Move varations and Board creation --
 def preparations(start, size):
-    board = []
-    start = list(start)
+    board = set()  # Use a set to keep track of visited cells
+    start = tuple(start)
     moves = (
-        (2, 1), (2, -1), (-2, 1), (-2, -1), 
+        (2, 1), (2, -1), (-2, 1), (-2, -1),
         (1, 2), (1, -2), (-1, 2), (-1, -2)
-            )
-    for y in range(size):
-        board += [["_" for x in range(size)]]    
-
+    )
     return board, moves, start
 
-
-
-#          -- Main calculations --
-def calculations(board, moves, start):
-    final_moves_list = [start]
-    board[start[0]][start[1]] = "K"
-
-
-
-    for m1, m2 in moves:
-        next_pos = [start[0] + m1, start[1] + m2]
-        try:
-            if board[next_pos[0]][next_pos[1]] != "K" and 0 <= next_pos[0] < len(board[0]) and 0 <= next_pos[1] < len(board[0]): 
-                return_position = calculations(board, moves, next_pos)
-                if return_position:               
-                    final_moves_list.extend(return_position)
-                    return final_moves_list
-                board[next_pos[0]][next_pos[1]] = "_"  
-        except IndexError:
-            continue
+def calculations(board, moves, start, path):
+    board.add(start)  # Add the current position to the visited set
+    path.append(start)  # Add the current position to the path
+    
+    if len(path) == size * size:
+        return True  # All cells are visited
+    
+    for dx, dy in moves:
+        x, y = start[0] + dx, start[1] + dy
+        next_pos = (x, y)
         
+        if 0 <= x < size and 0 <= y < size and next_pos not in board:
+            if calculations(board, moves, next_pos, path):
+                return True  # Found a valid path
+    # Backtrack
+    board.remove(start)
+    path.pop()
+    return False
 
-    if not any("_" in row for row in board):
-        return [start]
-
-
-def knights_tour(start, size):
+def knights_tour(start, board_size):
+    global size
+    size = board_size
     board, moves, start = preparations(start, size)
-    rslt = [tuple(x) for x in calculations(board, moves, start)]
-    return rslt
-
-
+    path = []
+    
+    if calculations(board, moves, start, path):
+        return path
+    else:
+        return "No solution found"
 
 start = (0, 0)
 size = 5
-moves = knights_tour(start, size)
-print(moves)
+path = knights_tour(start, size)
+print(path)
 # animate_tour(size, moves)
