@@ -20,17 +20,16 @@ def calculation():  # виконує дію оператора (рахує)
 
 while operator != "=":
     if wait_for_number:
-        if wait_for_number:
-            try:
-                operand = int(input("Введіть число "))
-                result = calculation()
-            except ValueError:
-                print(f"{operand} not a number. Try again")
-                wait_for_number = True
-                continue
-            if operator is None:
-                result = operand
-            wait_for_number = False
+        try:
+            operand = int(input("Введіть число "))
+            result = calculation()
+        except ValueError:
+            print(f"{operand} not a number. Try again")
+            wait_for_number = True
+            continue
+        if operator is None:
+            result = operand
+        wait_for_number = False
     else: # Перевірка оператора на правильність написання
         operator = input('Оператор ')
         if operator in ('+', '-', '*', '/'):
