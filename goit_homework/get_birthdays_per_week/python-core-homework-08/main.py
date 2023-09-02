@@ -2,6 +2,19 @@ from datetime import date, datetime
 from collections import defaultdict
 
 
+def get_week_day_name(birthday):
+    week_day_names = {
+        0: "Monday",
+        1: "Tuesday",
+        2: "Wednesday",
+        3: "Thursday",
+        4: "Friday",
+        5: "Monday",
+        6: "Monday"
+    }
+    return week_day_names[birthday.weekday()]
+
+
 def get_birthdays_per_week(users_list):
     today = date.today()
     birthdays_next_week = defaultdict(list)
@@ -14,27 +27,8 @@ def get_birthdays_per_week(users_list):
 
         days_to_birthday = (birthday - today).days
 
-        if 0 <= days_to_birthday < 7:
-            week_day = birthday.weekday()
-            if week_day == 0: 
-                week_day = "Monday"
-            if week_day == 1: 
-                week_day = "Tuesday"
-            if week_day == 2: 
-                week_day = "Wednesday"
-            if week_day == 3: 
-                week_day = "Thursday"
-            if week_day == 4: 
-                week_day = "Friday"
-            if week_day == 5: 
-                week_day = "Saturday"
-            if week_day == 6: 
-                week_day = "Sunday"
-
-            if week_day in ("Sunday", "Saturday"):
-                birthdays_next_week["Monday"].append(user["name"])
-            else:
-                birthdays_next_week[week_day].append(user["name"])
+        if 0 <= days_to_birthday <= 6:
+            birthdays_next_week[get_week_day_name(birthday)].append(user["name"])
 
     return birthdays_next_week
 
