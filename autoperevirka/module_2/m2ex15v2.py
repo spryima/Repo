@@ -5,7 +5,7 @@ operations = {
     "+": lambda a, b: a + b,
     "-": lambda a, b: a - b, 
     "*": lambda a, b: a * b,
-    "/": lambda a, b: a / b if b != 0 else (print("Devision by Zero"), exit())
+    "/": lambda a, b: a / b if b != 0 else exit("Devision by Zero")
 }
 
 
