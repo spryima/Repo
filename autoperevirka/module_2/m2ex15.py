@@ -4,7 +4,7 @@ operator = None
 wait_for_number = True
 
 
-def calculation():  # виконує дію оператора (рахує)
+def calculation():  
     if operator == '+':
         return result + operand
     elif operator == '-':
@@ -21,7 +21,7 @@ def calculation():  # виконує дію оператора (рахує)
 while operator != "=":
     if wait_for_number:
         try:
-            operand = int(input("Введіть число "))
+            operand = float(input("Enter your number "))
             result = calculation()
         except ValueError:
             print(f"{operand} not a number. Try again")
@@ -30,8 +30,8 @@ while operator != "=":
         if operator is None:
             result = operand
         wait_for_number = False
-    else: # Перевірка оператора на правильність написання
-        operator = input('Оператор ')
+    else: 
+        operator = input('Enter operator ')
         if operator in ('+', '-', '*', '/'):
             wait_for_number = True
         elif operator == '=':
@@ -40,5 +40,4 @@ while operator != "=":
             print(f"{operator} is not '+' or '-' or '/' or '*'. Try again")
             wait_for_number = False
             continue
-
 print(result)
