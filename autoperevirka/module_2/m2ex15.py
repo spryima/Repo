@@ -4,18 +4,33 @@ operator = None
 wait_for_number = True
 
 
+
 def calculation():  
-    if operator == '+':
-        return result + operand
-    elif operator == '-':
-        return result - operand
-    elif operator == '*':
-        return result * operand
-    elif operator == '/':
-        if operand == 0:
-            print('Division by zero is not allowed')
-            exit()
-        return result / operand
+    match operator:
+        case "+":
+            return result + operand
+        case "-":
+            return result - operand
+        case "*":
+            return result * operand
+        case "/":
+            if operand == 0:
+                print("Division by zero is not allowed")
+                exit()
+            return result / operand
+
+
+    # if operator == '+':
+    #     return result + operand
+    # elif operator == '-':
+    #     return result - operand
+    # elif operator == '*':
+    #     return result * operand
+    # elif operator == '/':
+    #     if operand == 0:
+    #         print('Division by zero is not allowed')
+    #         exit()
+    #     return result / operand
 
 
 while operator != "=":
