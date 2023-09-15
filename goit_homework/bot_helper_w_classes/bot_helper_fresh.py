@@ -1,5 +1,6 @@
 from collections import UserDict
 
+
 class Field:
     def __init__(self, value):
         self.value = value
@@ -11,6 +12,7 @@ class Field:
 class Name(Field):
     pass
 
+
 class Phone(Field):
     def __init__(self, phone_value):
         if not self.is_valid_number(phone_value):
@@ -18,9 +20,7 @@ class Phone(Field):
         super().__init__(phone_value)
 
     def is_valid_number(self, value):
-        if not value.isdigit():
-            return False
-        return True if len(value) == 10 else False
+        return True if len(value) == 10 and value.isdigit() else False
             
 
 class Record:
