@@ -9,7 +9,7 @@ class Field:
 
 
 class Name(Field):
-    ...
+    pass
 
 class Phone(Field):
     def __init__(self, phone_value):
@@ -18,6 +18,8 @@ class Phone(Field):
         super().__init__(phone_value)
 
     def is_valid_number(self, value):
+        if not value.isdigit():
+            return False
         return True if len(value) == 10 else False
             
 
@@ -31,23 +33,24 @@ class Record:
         self.phones.append(phone_obj)
     
     def remove_phone(self, number):
-        if number in self.phones:
-            self.phones.remove(number)
-            print(f"Number was successfully deleted")
-        else:
-            print(f"{self.name.value} don't have such number")
+        for phone_obj in self.phones:
+            if phone_obj.value == number:
+                self.phones.remove(phone_obj)
+                return print(f"Number was successfully deleted")
+        print(f"{self.name.value} doesn't have such number")
 
     def edit_phone(self, old_number, new_number):
-        try:
-            index = self.phones.index(old_number)
-            self.phones[index] = new_number
-        except ValueError:
-            print(f"{self.name.value} doesn't have such number")
-
+        for phone_obj in self.phones:
+            if phone_obj.value == old_number:
+                phone_obj.value = new_number
+                return
+        raise ValueError(f"{self.name} doesn't have such number")
+            
     def find_phone(self, number):
-        if number in self.phones:
-            return number
-        print(f"{self.name.value} doesn't have such number")
+        for phone_obj in self.phones:
+            if phone_obj.value == number:
+                return phone_obj
+        print(f"{self.name} doesn't have such number")
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
@@ -65,6 +68,3 @@ class AddressBook(UserDict):
             self.data.pop(name)
             return print(f"{name} was successfully deleted")
         return print(f"{name} was not found in address book")
-
-
-
