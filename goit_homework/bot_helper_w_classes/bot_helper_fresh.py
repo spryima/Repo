@@ -1,3 +1,4 @@
+
 from collections import UserDict
 
 
@@ -24,9 +25,12 @@ class Phone(Field):
             
 
 class Record:
-    def __init__(self, name_value):
-        self.name = Name(name_value)
-        self.phones = []
+    def __init__(self, name, phone=None):
+        self.name = name if isinstance(name, Name) else Name(name)
+        if phone:
+            self.phones = [phone] if isinstance(phone, Phone) else [Phone(phone)]
+        else:
+            self.phones = []
 
     def add_phone(self, number):
         phone_obj = Phone(number)
@@ -62,7 +66,7 @@ class AddressBook(UserDict):
 
     def find(self, name):
         return self.data.get(name)
-              
+            
     def delete(self, name):
         if name in self.data:
             self.data.pop(name)
