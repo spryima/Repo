@@ -51,7 +51,7 @@ class Phone(Field):
             else:
                 raise InvalidPhoneFormat(f"Invalid Phone format. Use 10 digits, please")
     def __repr__(self) -> str:
-        return super().__repr__()
+        return self.value
 
 class Birthday(Field):
     @property
@@ -81,8 +81,10 @@ class Contact():
 
     def change_phone(self, old_phone: str, new_phone: str):
         if old_phone in [phone_obj.value for phone_obj in self.phone]:
-            self.phone.append(new_phone)
-            self.phone.remove(old_phone)
+            self.phone.append(Phone(new_phone))
+            for index, ph_obj in enumerate(self.phone):
+                if ph_obj.value == old_phone:
+                    self.phone.pop(index)
         else:
             raise NoSuchPhone("Contact {self.name.value} doesn't have such number")
 

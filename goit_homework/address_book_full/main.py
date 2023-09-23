@@ -6,12 +6,16 @@ from ab_classes import (
     AddressBook, 
     )
 import re
+import os
 import json
 from pathlib import Path
 
 
 def green_print(text):
     print(f'\033[92m{text}\033[0m', end="")
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def input_error(func):
@@ -56,21 +60,19 @@ def unknown_command():
     return f"Unknown command"
 
 
-def exit_command(*_):
-    
+def exit_command(*_):  
     contacts = []
-
     for rec in address_book.values():
         contacts.append(
             {
             "name": rec.name.value,
-            "phone": ", ".join(str(ph) for ph in rec.phone),
+            "phone": [phone.value for phone in rec.phone],
             "birthday": rec.birthday if rec.birthday == "" else rec.birthday.value,
             }
         )       
 
     current_dir = Path(__file__).resolve().parent
-    with open(current_dir / "__contacts.json", "w") as fh:
+    with open(current_dir / "contacts.json", "w") as fh:
         json.dump(contacts, fh)
     return f"Good bye!"
     
@@ -99,6 +101,7 @@ def change_command(name, *args):
 def show_all_command(*_):
     for rec in address_book.values():
         print(rec)
+
 
 def delete_all_command(*_):
     final_check = input(f"\033[91mDo you realy want to Delete Address Book?\033[0m  Y/n >> ")
@@ -160,21 +163,18 @@ command_list = {
 }
 
 def main():
-
     # json Address Book import 
     current_dir = Path(__file__).resolve().parent
-    path_to_json = Path(current_dir / "__contacts.json")
+    path_to_json = Path(current_dir / "contacts.json")
     if path_to_json.is_file():
         with open(path_to_json, "r") as fh:
             records = json.load(fh)
             for json_rec in records:
-                contact_obj = Contact(
-                    Name(json_rec["name"]),
-                    Phone(json_rec["phone"]) if json_rec["phone"] else "",
-                    Birthday(json_rec["birthday"]) if json_rec["birthday"] else "",
-                    )
+                contact_obj = Contact(Name(json_rec["name"]))
+                contact_obj.birthday = Birthday(json_rec["birthday"]) if json_rec["birthday"] else ""
+                contact_obj.phone = [Phone(phone) for phone in json_rec["phone"]] if json_rec else []
                 address_book.add_contact(contact_obj)
-
+    clear_screen()
     green_print('                 "ADDRESS BOOK"')
     print()
     green_print("help  ")
@@ -190,7 +190,6 @@ def main():
         
         if cmd == exit_command:  
             break
-
 
 
 if __name__ == "__main__":
