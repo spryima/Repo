@@ -148,7 +148,7 @@ def main():
 
         response = cmd(ui, *data)
         if response:
-            ui_console.show_message(response)
+            ui.show_message(response)
         
         if cmd == exit_command:  
             break
