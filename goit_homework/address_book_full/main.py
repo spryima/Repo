@@ -1,34 +1,27 @@
+import re
+from ui_classes import ConsoleUserInterface
+import json
+from pathlib import Path
 from ab_classes import (
     Phone, 
     Birthday, 
     Name, 
     Contact, 
-    AddressBook, 
+    AddressBook,
     )
-import re
-import os
-import json
-from pathlib import Path
-
-
-def green_print(text):
-    print(f'\033[92m{text}\033[0m', end="")
-
-def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def input_error(func):
-    def wrapper(*args):
+    def wrapper(ui, *args):
         try:
-            return func(*args)
+            return func(ui, *args)
         except Exception as e:
-            return e
+            ui.show_message(e)
     return wrapper
 
 
 @input_error
-def add_command(name, *args):
+def add_command(ui, name, *args):
 
 #  is name in AddressBook
     if name in address_book:
@@ -45,7 +38,7 @@ def add_command(name, *args):
         if  any(char in arg for char in ('\\', '.', '/', '-')):
             birthday_obj = Birthday(arg)
             rec.add_birthday(birthday_obj)
-    return f"Add success"
+    ui.show_message(f"Add success")
 
 
 def parser(text):
@@ -56,11 +49,11 @@ def parser(text):
     return unknown_command, []
 
 
-def unknown_command():
-    return f"Unknown command"
+def unknown_command(ui, *args):
+    ui.show_message("Unknown command")
 
 
-def exit_command(*_):  
+def exit_command(ui, *_):  
     contacts = []
     for rec in address_book.values():
         contacts.append(
@@ -74,17 +67,14 @@ def exit_command(*_):
     current_dir = Path(__file__).resolve().parent
     with open(current_dir / "contacts.json", "w") as fh:
         json.dump(contacts, fh)
-    return f"Good bye!"
+    ui.show_message(f"Good bye!")
     
 
-def find_command(val):
-    for rec in address_book.values():
-        if val in str(rec):
-            print(rec)
-
+def find_command(ui, name):
+    ui.show_message("\n".join(str(rec) for rec in address_book.values() if name in str(rec)))
 
 @input_error
-def change_command(name, *args):
+def change_command(ui, name, *args):
     if name in address_book:
         rec = address_book[name]
         if re.search(r"[a-zA-z]", args[0]):
@@ -93,62 +83,35 @@ def change_command(name, *args):
             rec.change_phone(args[0], args[1])
         else:
             rec.change_birthday(args[0])
-        return f"Change success"
+        ui.show_message(f"Change success")
     else:
-        return f"No such contact in Address Book"
+        ui.show_message(f"No such contact in Address Book")
 
 
-def show_all_command(*_):
-    for rec in address_book.values():
-        print(rec)
-
-
-def delete_all_command(*_):
-    final_check = input(f"\033[91mDo you realy want to Delete Address Book?\033[0m  Y/n >> ")
-    if final_check.lower() == "y":
-        address_book.delete_all()
-
-
-@input_error
-def delete_command(name):
-    if name in address_book:
-        address_book.delete(name)
-        return f"Contact {name} was deleted successfully"
-    else:
-        return f"No such contact in Address Book"
+def show_all_command(ui, *_):
+    ui.show_all_contacts(address_book)
     
 
-def help_command(*_):
-    return help_message
+def delete_all_command(ui, *_):
+    final_check = ui.ask_question_input(f"\033[91mDo you really want to Delete Address Book?\033[0m  Y/n >> ")
+    if final_check.lower() == "y":
+        address_book.delete_all()
+        ui.show_message("Address Book has been deleted.")
+    else:
+        ui.show_message("Operation cancelled.")
 
+@input_error
+def delete_command(ui, name):
+    if name in address_book:
+        address_book.delete(name)
+        ui.show_message(f"Contact {name} was deleted successfully")
+    else:
+        ui.show_message(f"No such contact in Address Book")
+    
 
-help_message = """
-                        List of all commands:
-help   - show this list
+def help_command(ui, *_):
+    ui.show_help()
 
-add name [phone] [birthday]         - add New contact (phone and birthday are optional)
-add Bill 0123456789 01.01.1987      - add New contact w phone and birthday
-add Bill                            - add New contact
-add Bill 0123456789                 - add New contact or add New Phone to contact
-add Bill 01.01.1987                 - add New contact or add Birthday to contact
-
-find name|number                    - find matches in user names or phone numbers
-find ike                            - find all contacts matching "ike"
-find 0934                           - find all contacts matching phone with "0934"
-
-delete Bill
-delete name                         - delete existing contact
-
-show all                            - show all contacts in Address Book
-
-change [name] [phone] [birthday]    - change name/phone/birthday 
-change Bill Mike                    - change Bill to Mike
-change Bill 1234567890 1111111111   - change Bill's phone number
-change Bill 12.11.1987 01.11.1991   - change Bill's birthday
-change Bill 1231231230              - delete Bill's 1231231230 number
-
-delete all                          - delete Address Book
-"""
 
 address_book = AddressBook()
 command_list = {
@@ -163,6 +126,7 @@ command_list = {
 }
 
 def main():
+    ui = ConsoleUserInterface()
     # json Address Book import 
     current_dir = Path(__file__).resolve().parent
     path_to_json = Path(current_dir / "contacts.json")
@@ -174,19 +138,17 @@ def main():
                 contact_obj.birthday = Birthday(json_rec["birthday"]) if json_rec["birthday"] else ""
                 contact_obj.phone = [Phone(phone) for phone in json_rec["phone"]] if json_rec else []
                 address_book.add_contact(contact_obj)
-    clear_screen()
-    green_print('                 "ADDRESS BOOK"')
-    print()
-    green_print("help  ")
-    print("- to get more information  about commands")
+
+    ui.show_start_message()
+
     while True:
-        message = input("   >>> ").strip()
+        message = ui.ask_question_input("   >>> ").strip()
 
         cmd, data = parser(message)
 
-        response = cmd(*data)
+        response = cmd(ui, *data)
         if response:
-            print(response)
+            ui_console.show_message(response)
         
         if cmd == exit_command:  
             break

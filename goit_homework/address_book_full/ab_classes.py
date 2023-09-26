@@ -1,16 +1,9 @@
 from datetime import datetime
 from collections import UserDict
 import re
-import json
 
 
-class InvalidPhoneFormat(Exception):
-    pass
-
-class InvalidBirthdayFormat(Exception):
-    pass
-
-class InvalidNameFormat(Exception):
+class InvalidFormat(Exception):
     pass
 
 class NoSuchPhone(Exception):
@@ -18,7 +11,7 @@ class NoSuchPhone(Exception):
 
 class Field():
     def __init__(self, value) -> None:
-        self._value = ""
+        self.__value = ""
         self.value = value
 
     def __str__(self) -> str:
@@ -27,43 +20,43 @@ class Field():
 
 class Name(Field):
     @property
-    def value(self):
-        return self._value
+    def value(self):    
+        return self.__value
     
     @value.setter
     def value(self, value):
         if re.search(r"[a-zA-Z]", value):
-            self._value = value
+            self.__value = value
         else:
-            raise InvalidNameFormat(f"Invalid name format. Use at least 1 letter, please")
+            raise InvalidFormat(f"Invalid name format. Use at least 1 letter, please")
 
 
 class Phone(Field):
     @property
     def value(self):
-       return self._value
+       return self.__value
 
     @value.setter
     def value(self, value):
         if value:
             if len(value) == 10:
-                self._value = value
+                self.__value = value
             else:
-                raise InvalidPhoneFormat(f"Invalid Phone format. Use 10 digits, please")
+                raise InvalidFormat(f"Invalid Phone format. Use 10 digits, please")
     def __repr__(self) -> str:
         return self.value
 
 class Birthday(Field):
     @property
     def value(self):
-        return self._value.strftime("%d.%m.%Y")
+        return self.__value.strftime("%d.%m.%Y")
 
     @value.setter
     def value(self, bday):  
         if re.match(r"[0-3][0-9][.|\\|/|-](([0][1-9])|([1][0-2]))[.|\\|/|-]\d{4}",bday):
-            self._value = datetime.strptime(f"{bday[0:2]}-{bday[3:5]}-{bday[-4:]}", "%d-%m-%Y")
+            self.__value = datetime.strptime(f"{bday[0:2]}-{bday[3:5]}-{bday[-4:]}", "%d-%m-%Y")
         else:
-            raise InvalidBirthdayFormat(f"Invalid Birthday format. Use -> dd.mm.yyyy")
+            raise InvalidFormat(f"Invalid Birthday format. Use -> dd.mm.yyyy")
 
 
 class Contact():
@@ -113,3 +106,5 @@ class AddressBook(UserDict):
     
     def delete_all(self):
         self.data.clear()
+
+
