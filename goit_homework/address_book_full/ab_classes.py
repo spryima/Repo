@@ -1,13 +1,7 @@
 from datetime import datetime
 from collections import UserDict
 import re
-
-
-class InvalidFormat(Exception):
-    pass
-
-class NoSuchPhone(Exception):
-    pass
+from exceptions_classes import NoSuchPhone, InvalidFormat
 
 class Field():
     def __init__(self, value) -> None:

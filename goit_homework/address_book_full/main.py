@@ -17,7 +17,7 @@ def input_error(func):
             return func(ui, *args)
         except Exception as e:
             ui.show_message(e)
-    return wrapper
+    return wrapper      
 
 
 @input_error

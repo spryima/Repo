@@ -1,0 +1,22 @@
+FROM python:3.11.5
+
+# Встановлюємо poetry
+RUN pip install poetry
+
+# Відключаємо створення віртуального середовища (в докері не потрібне)
+RUN poetry config virtualenvs.create false
+
+# Встановлюємо робочий каталог
+WORKDIR /app
+
+# Копіюємо файли конфігурації poetry
+COPY poetry.lock pyproject.toml /app/
+
+# Встановлюємо залежності
+RUN poetry install --no-dev
+
+# Копіюємо всі файли проекту
+COPY . /app/
+
+# Запускаємо Python скрипт
+ENTRYPOINT [ "python", "main.py" ]
