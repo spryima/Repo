@@ -54,12 +54,8 @@ def main():
     dirs_to_sortout = get_dirs()
 
     threads_dividing(dirs_to_sortout) 
-    
-
-
 
 
 if __name__ == "__main__":
     main()
    
-    
