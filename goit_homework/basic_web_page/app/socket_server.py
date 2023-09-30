@@ -14,14 +14,6 @@ class ServerConfig:
 
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
-    """
-    The request handler class for our server.
-
-    It is instantiated once per connection to the server, and must
-    override the handle() method to implement communication to the
-    client.
-    """
-
     def handle(self):
         self.data = self.request.recv(ServerConfig.BUFFER_SIZE).strip()
         print("{} wrote:".format(self.client_address[0]))
