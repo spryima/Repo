@@ -23,7 +23,12 @@ class GetExchage():
     async def log_exchange_rate_requests(self):
         async with aiofiles.open('exchr_cmd.log', 'a') as afh:
             await afh.write(f"{datetime.today().strftime('%d.%m.%Y  %H:%M:%S')}  {self.customer_name} requested {self.currencies} currencies ExRate for last {self.days} days \n")
-        
+
+    async def log_exceptions(self, message):
+        async with aiofiles.open('exchr_cmd.log', 'a') as afh:
+            await afh.write(f"{datetime.today().strftime('%d.%m.%Y  %H:%M:%S')}  {message} \n")
+
+
     def __get_dates_list(self, days) -> list:
         return [(datetime.now() - timedelta(days=day)) .strftime('%d.%m.%Y') for day in range(int(days))]
 
@@ -39,9 +44,9 @@ class GetExchage():
                     if response.status == 200:
                         return await response.json()
                     else:
-                        print(f"{response.status}")
+                        asyncio.create_task(self.log_exceptions(response.status))
             except aiohttp.ClientConnectionError as err:
-                print(err)
+                asyncio.create_task(self.log_exceptions(err))
 
     def __json_to_text(self, cur):
         filtered_currencies = list(filter(lambda x: x['currency'] in (self.currencies), cur['exchangeRate']))
