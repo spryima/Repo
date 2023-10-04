@@ -12,7 +12,7 @@ class GetExchage():
         self.days = 1
         self.customer_name = name
         self.parsing(message)
-        
+
     def parsing(self, message):
         for cmd in message.upper().split():
             if cmd.isdigit():
@@ -20,15 +20,12 @@ class GetExchage():
             if cmd in self.all_currencies:
                 self.currencies.append(cmd)
 
-    async def log_exchange_rate_requests(self):
-        async with aiofiles.open('exchr_cmd.log', 'a') as afh:
-            await afh.write(f"{datetime.today().strftime('%d.%m.%Y  %H:%M:%S')}  {self.customer_name} requested {self.currencies} currencies ExRate for last {self.days} days \n")
-
-    async def log_exceptions(self, message):
-        async with aiofiles.open('exchr_cmd.log', 'a') as afh:
-            await afh.write(f"{datetime.today().strftime('%d.%m.%Y  %H:%M:%S')}  {message} \n")
-
-
+    async def get_exchange(self):
+        asyncio.create_task(self.log_exchange_rate_requests())
+        dates =self.__get_dates_list(self.days)
+        tasks = await self.creating_async_tasks(dates)
+        return self.__return_readable_results(tasks)
+    
     def __get_dates_list(self, days) -> list:
         return [(datetime.now() - timedelta(days=day)) .strftime('%d.%m.%Y') for day in range(int(days))]
 
@@ -48,12 +45,6 @@ class GetExchage():
             except aiohttp.ClientConnectionError as err:
                 asyncio.create_task(self.log_exceptions(err))
 
-    def __json_to_text(self, cur):
-        filtered_currencies = list(filter(lambda x: x['currency'] in (self.currencies), cur['exchangeRate']))
-        formatted_currencies = [[cur['date'], x['currency'], {'sale': x.get('saleRate'), 'purchase': x.get('purchaseRate')}]  for x in filtered_currencies]
-        return formatted_currencies
-
-
     def __return_readable_results(self, responce_list):           
         message = "Exchange rates:\n"
         
@@ -69,9 +60,36 @@ class GetExchage():
     '''
         return message
 
-    async def get_exchange(self):
-        asyncio.create_task(self.log_exchange_rate_requests())
-        dates =self.__get_dates_list(self.days)
-        tasks = await self.creating_async_tasks(dates)
-        return self.__return_readable_results(tasks)
+    def __json_to_text(self, cur):
+        filtered_currencies = list(filter(lambda x: x['currency'] in (self.currencies), cur['exchangeRate']))
+        formatted_currencies = [[cur['date'], x['currency'], {'sale': x.get('saleRate'), 'purchase': x.get('purchaseRate')}]  for x in filtered_currencies]
+        return formatted_currencies
+
+    async def log_exchange_rate_requests(self):
+        async with aiofiles.open('exchr_cmd.log', 'a') as afh:
+            await afh.write(f"{datetime.today().strftime('%d.%m.%Y  %H:%M:%S')}  {self.customer_name} requested {self.currencies} currencies ExRate for last {self.days} days \n")
+
+    async def log_exceptions(self, message):
+        async with aiofiles.open('exchr_cmd.log', 'a') as afh:
+            await afh.write(f"{datetime.today().strftime('%d.%m.%Y  %H:%M:%S')}  {message} \n")
+
+
+
+
+
+
+
+    
+
+
+
+
+ 
+
+
+
+
+
+
+
 
