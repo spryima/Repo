@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "postgresql-university"
+version = "0.1.0"
+description = "PostgreSQL University project(creating and filling with Faker)"
+authors = ["Sergii Pryima"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+faker = "^19.6.2"
+psycopg2-binary = "^2.9.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
